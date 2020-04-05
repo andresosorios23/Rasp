@@ -79,7 +79,6 @@
     <ClInclude Include="alglib\ap.h" />
     <ClInclude Include="alglib\fasttransforms.h" />
     <ClInclude Include="alglib\linalg.h" />
-    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
