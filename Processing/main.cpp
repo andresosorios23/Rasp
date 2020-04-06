@@ -120,8 +120,8 @@ int main(void)
 			}
 			//Se fija la referencia a la fase del voltaje
 			theta_c -=theta_v;
-			if (theta_c > M_PI / 2.0) {
-				theta_c -= M_PI;
+			if (theta_c < -M_PI / 2.0) {
+				theta_c += M_PI;
 			}
 			theta_v = 0;
 

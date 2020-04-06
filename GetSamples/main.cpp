@@ -24,10 +24,11 @@ struct windowseg {
 struct tm* ts;
 struct windowseg* window;
 int shmid, cnt;
+float f, phase, I, V;
 const size_t mmove_size = (SAMPLES - 1) * sizeof(double);
 
 double adc_voltage, adc_current, t;
-int f;
+
 
 //Función para almacenar los datos en la zona de memoria compartida
 void alarm_callback(int signum) {
@@ -37,8 +38,8 @@ void alarm_callback(int signum) {
 		t = t + float(SIGNAL_uS) / 1000000.0; //contador de tiempo
 		memmove(&window->voltage[0], &window->voltage[1], mmove_size); //Se mueve la ventana de tiempo para poder almacenar un nuevo dato
 		memmove(&window->current[0], &window->current[1], mmove_size);
-		adc_voltage = 20 * cos(58 * 2 * M_PI * t);
-		adc_current = 20 * cos(58 * 2 * M_PI * t);
+		adc_voltage = V * M_SQRT2 * cos(f * 2 * M_PI * t);
+		adc_current = I * M_SQRT2 * cos(f * 2 * M_PI * t + phase*M_PI/180);
 		window->voltage[SAMPLES - 1] = adc_voltage;
 		window->current[SAMPLES - 1] = adc_current;
 		window->busy = 0;
@@ -68,6 +69,17 @@ int main(void)
 		printf("shared memory attach failed\n");
 	}
 	printf("initialization succeed and shmem (w) interface opened\n");
+	printf("Ingrese la frecuencia de las senales en Hz: ");
+	scanf("%f", &f);
+	printf("Ingrese la magnitud RMS de la corriente en amperios: ");
+	scanf("%f", &I);
+	printf("Ingrese la magnitud RMS del voltaje en voltios: ");
+	scanf("%f", &V);
+	printf("Ingrese la fase de la corriente en grados: ");
+	scanf("%f", &phase);
+	printf("Simulando...");
+
+
 
 	//Configuración de las alarmas para ejecutar o terminar funciones
 	signal(SIGALRM, alarm_callback); //ejecutar la simulacion de datos cada cierto tiempo
