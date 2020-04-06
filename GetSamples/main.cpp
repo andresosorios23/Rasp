@@ -17,14 +17,14 @@
 #include <cstdio>
 #include <ctime>
 
-
 #define SIGNAL_uS 500 //sampling period in uS
 #define SAMPLES 1000 
 #define SHM_KEY 0x1234
 
+
 struct windowseg {
-	time_t timestamp;
 	int busy;
+	time_t timestamp;
 	double voltage[SAMPLES];
 	double current[SAMPLES];
 };
@@ -42,16 +42,15 @@ void alarm_callback(int signum) {
 	if (cnt == 10) {
 		window->busy = 1;
 		time(&window->timestamp);
-		ts = localtime(&window->timestamp);
 		t = t + float(SIGNAL_uS) / 1000000.0;
 		memmove(&window->voltage[0], &window->voltage[1], mmove_size);
 		memmove(&window->current[0], &window->current[1], mmove_size);
-		adc_voltage = 20 * cos(58 * 2 * M_PI * t + M_PI/4);
+		adc_voltage = 20 * cos(58 * 2 * M_PI * t);
 		adc_current = 20 * cos(58 * 2 * M_PI * t);
 		window->voltage[SAMPLES - 1] = adc_voltage;
 		window->current[SAMPLES - 1] = adc_current;
 		window->busy = 0;
-		//printf("%f\n",window->current[SAMPLES - 1]);
+		//printf("%f\n",window->voltage[SAMPLES - 1]);
 		cnt = -1;
 	}
 	cnt++;
@@ -77,10 +76,12 @@ int main(void)
 	if (window == (void*)-1) {
 		printf("shared memory attach failed\n");
 	}
-
 	printf("initialization succeed and shmem (w) interface opened\n");
+
+
 	signal(SIGALRM, alarm_callback);
 	signal(SIGINT, term_callback);
+
 	while (1) {
 		ualarm(SIGNAL_uS, SIGNAL_uS);
 		sleep(1000);
